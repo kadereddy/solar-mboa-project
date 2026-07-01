@@ -1,0 +1,25 @@
+version: '3.8' 
+ 
+services: 
+  redis: 
+    image: redis:7.2-alpine 
+    container_name: solar-redis 
+    ports: 
+      - "6379:6379" 
+    networks: 
+      - solar-net 
+ 
+  mongodb: 
+    image: mongo:7.0 
+    container_name: solar-mongo 
+    ports: 
+      - "27017:27017" 
+    environment: 
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER:-admin} 
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASS:-securepass} 
+    networks: 
+      - solar-net 
+ 
+networks: 
+  solar-net: 
+    driver: bridge 
