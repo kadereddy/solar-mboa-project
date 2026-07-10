@@ -69,6 +69,7 @@ volumétrie estimée et le pattern d'accès (lecture vs écriture-intensive).
 
 Depuis la racine du projet (`solar-mboa-project/`) :
 
+```bash
 # 1. Cloner et se placer dans le dossier
 
 git clone https://github.com/kadereddy/solar-mboa-project.git
@@ -101,6 +102,7 @@ docker compose up -d
 # 7. Vérifier que tout est "healthy" (prévoir ~60-90s pour Cassandra/Neo4j)
 
 docker compose ps
+```
 
 ## Exécution des scripts
 
