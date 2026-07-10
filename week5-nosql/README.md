@@ -69,19 +69,38 @@ volumétrie estimée et le pattern d'accès (lecture vs écriture-intensive).
 
 Depuis la racine du projet (`solar-mboa-project/`) :
 
-```powershell
-# 1. Activer l'environnement virtuel
+# 1. Cloner et se placer dans le dossier
+
+git clone https://github.com/kadereddy/solar-mboa-project.git
+cd solar-mboa-project
+
+# 2. Copier les variables d'environnement
+
+cp .env.example .env
+
+# 3. Créer l'environnement virtuel
+
+python -m venv venv
+
+# 4. Activer l'environnement virtuel
+
 .\venv\Scripts\Activate.ps1
 
-# 2. Installer les dépendances
+# En cas d'erreur de politique d'exécution, lancer d'abord :
+
+# Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+# 5. Installer les dépendances
+
 pip install -r requirements.txt
 
-# 3. Démarrer les 5 bases de données
+# 6. Démarrer les 5 bases de données
+
 docker compose up -d
 
-# 4. Vérifier que tout est "healthy" (prévoir ~60-90s pour Cassandra/Neo4j)
+# 7. Vérifier que tout est "healthy" (prévoir ~60-90s pour Cassandra/Neo4j)
+
 docker compose ps
-```
 
 ## Exécution des scripts
 
