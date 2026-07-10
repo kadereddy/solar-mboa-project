@@ -105,16 +105,6 @@ Chaque script :
 3. Exécute des requêtes analytiques spécifiques à la base
 4. Affiche un résumé (volumes, débit, résultats)
 
-### Comportement au ré-exécution
-
-| Base      | Nettoie avant de recharger ?                                                                     |
-| --------- | ------------------------------------------------------------------------------------------------ |
-| Redis     | Oui — `flushdb()` automatique à chaque run                                                       |
-| MongoDB   | Oui — `collection.drop()` avant réinsertion                                                      |
-| Cassandra | **Non** — penser à `TRUNCATE` la table avant de relancer si les données source ont changé        |
-| Neo4j     | **Non** — penser à `MATCH (n) DETACH DELETE n` avant de relancer si besoin                       |
-| InfluxDB  | **Non** — les points s'accumulent ; supprimer/recréer le bucket si les données source ont changé |
-
 ## Interfaces web
 
 | Base          | URL                   |
