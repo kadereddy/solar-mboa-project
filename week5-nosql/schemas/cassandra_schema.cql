@@ -1,1 +1,0 @@
-# Schéma Cassandra 

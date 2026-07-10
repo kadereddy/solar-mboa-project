@@ -1,0 +1,88 @@
+# ============================================
+# .gitignore - Projet SolarMboa
+# ============================================
+
+# ===== ENVIRONNEMENTS VIRTUELS =====
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+virtualenv/
+pythonenv*
+*.egg-info/
+
+# ===== VARIABLES D'ENVIRONNEMENT =====
+.env
+.env.local
+.env.*.local
+*.env
+*.env.*
+!*.env.example
+
+# ===== PYTHON =====
+__pycache__/
+*.py[cod]
+*.pyc
+*.pyo
+*.so
+*.pyd
+*.egg
+*.egg-info/
+
+# ===== IDÉ =====
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ===== LOGS =====
+logs/
+*.log
+*.out
+*.err
+*.tmp
+*.temp
+*.cache
+
+# ===== JUPYTER =====
+.ipynb_checkpoints/
+*.ipynb
+!*.ipynb
+
+# ===== TESTS =====
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+
+# ===== DONNÉES =====
+*.db
+*.sqlite
+*.sqlite3
+data/
+raw_data/
+processed_data/
+
+# ===== ARCHIVES =====
+*.zip
+*.tar.gz
+*.tgz
+*.rar
+*.7z
+*.gz
+*.bz2
+
+# ===== GCP =====
+*.json
+*.key
+*.pem
+*.crt
+service-account*.json
+*-credentials.json
+.gcloud/
+.google/

@@ -1,1 +1,0 @@
-# Script d'ingestion complet 

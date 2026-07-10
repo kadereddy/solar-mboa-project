@@ -1,0 +1,151 @@
+version: "3.9"
+
+# ================================================================
+# SolarMboa Technologies – Stack NoSQL Semaine 5
+# 5 bases : Redis | MongoDB | Cassandra | Neo4j | InfluxDB
+# Lancement : docker compose up -d
+# Arrêt     : docker compose down -v
+# ================================================================
+
+networks:
+  solarmboa-net:
+    driver: bridge
+
+volumes:
+  redis_data:
+  mongo_data:
+  cassandra_data:
+  neo4j_data:
+  neo4j_logs:
+  influx_data:
+  influx_config:
+
+services:
+  # ---------------------------------------------------------------
+  # 1. REDIS – Cache LRU des sessions de compteurs IoT
+  # ---------------------------------------------------------------
+  redis:
+    image: redis:7.2-alpine
+    container_name: solarmboa-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
+    networks:
+      - solarmboa-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ---------------------------------------------------------------
+  # 2. MONGODB – Profils d'installation enrichis
+  # ---------------------------------------------------------------
+  mongodb:
+    image: mongo:7.0
+    container_name: solarmboa-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER:-solarmboa_app}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-app_password_2026}
+      MONGO_INITDB_DATABASE: solarmboa
+    volumes:
+      - mongo_data:/data/db
+      - ./mongodb/init:/docker-entrypoint-initdb.d
+    networks:
+      - solarmboa-net
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+
+  # ---------------------------------------------------------------
+  # 3. CASSANDRA – Ingestion haute fréquence télémétrie IoT
+  # ---------------------------------------------------------------
+  cassandra:
+    image: cassandra:4.1
+    container_name: solarmboa-cassandra
+    restart: unless-stopped
+    ports:
+      - "9042:9042"
+    environment:
+      CASSANDRA_CLUSTER_NAME: SolarMboaCluster
+      CASSANDRA_DC: cameroon-dc1
+      CASSANDRA_RACK: rack1
+      CASSANDRA_ENDPOINT_SNITCH: GossipingPropertyFileSnitch
+      MAX_HEAP_SIZE: 512M
+      HEAP_NEWSIZE: 100M
+    volumes:
+      - cassandra_data:/var/lib/cassandra
+    networks:
+      - solarmboa-net
+    healthcheck:
+      test: ["CMD-SHELL", "nodetool status | grep UN"]
+      interval: 30s
+      timeout: 15s
+      retries: 10
+      start_period: 90s
+
+  # ---------------------------------------------------------------
+  # 4. NEO4J – Réseau de distribution et détection de fraude
+  # ---------------------------------------------------------------
+  neo4j:
+    image: neo4j:5.18-community
+    container_name: solarmboa-neo4j
+    restart: unless-stopped
+    ports:
+      - "7474:7474" # HTTP Browser
+      - "7687:7687" # Bolt
+    environment:
+      NEO4J_AUTH: ${NEO4J_USER:-neo4j}/${NEO4J_PASSWORD:-solarmboa2025}
+      NEO4J_PLUGINS: '["apoc"]'
+      NEO4J_dbms_security_procedures_unrestricted: apoc.*
+      NEO4J_server_memory_heap_initial__size: 256m
+      NEO4J_server_memory_heap_max__size: 512m
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+    networks:
+      - solarmboa-net
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:7474 || exit 1"]
+      interval: 20s
+      timeout: 10s
+      retries: 8
+      start_period: 60s
+
+  # ---------------------------------------------------------------
+  # 5. INFLUXDB – Métriques production solaire temps réel
+  # ---------------------------------------------------------------
+  influxdb:
+    image: influxdb:2.7-alpine
+    container_name: solarmboa-influxdb
+    restart: unless-stopped
+    ports:
+      - "8086:8086"
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: ${INFLUX_USER:-solarmboa}
+      DOCKER_INFLUXDB_INIT_PASSWORD: ${INFLUX_PASSWORD:-solarmboa2025}
+      DOCKER_INFLUXDB_INIT_ORG: solarmboa-tech
+      DOCKER_INFLUXDB_INIT_BUCKET: solar_metrics
+      DOCKER_INFLUXDB_INIT_RETENTION: 30d
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${INFLUX_TOKEN:-solarmboa-super-secret-token-2025}
+    volumes:
+      - influx_data:/var/lib/influxdb2
+      - influx_config:/etc/influxdb2
+    networks:
+      - solarmboa-net
+    healthcheck:
+      test: ["CMD", "influx", "ping"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
